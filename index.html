@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment in a Dental Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --brand-deep-purple: #532A8C;
+            --brand-mid-purple: #9D8ABB;
+            --brand-light-purple: #C3ACE8;
+            --brand-green: #7ABF49;
+            --brand-light-green: #96BF78;
+            --brand-bg: #F2F2F2;
+        }
+
+        body {
+            background-color: var(--brand-bg);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+
+        .tab-bar {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .tab-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .tab-item {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            opacity: 0.6;
+        }
+
+        .tab-item.active {
+            opacity: 1;
+            border-bottom-color: var(--brand-green);
+            background: white;
+        }
+
+        .tab-item.active .tab-icon-circle {
+            background: var(--brand-green);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .tab-icon-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--brand-light-purple);
+            color: var(--brand-deep-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            text-align: center;
+            color: var(--brand-deep-purple);
+        }
+
+        .content-area {
+            padding: 32px;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-icon-box {
+            width: 56px;
+            height: 56px;
+            background: var(--brand-bg);
+            color: var(--brand-green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-prev {
+            color: var(--brand-mid-purple);
+        }
+        
+        .btn-prev:hover { background: var(--brand-bg); }
+
+        .btn-next {
+            background: var(--brand-deep-purple);
+            color: white;
+        }
+
+        .btn-next:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Compact Tab Navigation -->
+        <nav class="tab-bar" id="tabBar">
+            <div class="tab-item active" onclick="showStep(1)" id="tab-1">
+                <div class="tab-icon-circle">1</div>
+                <span class="tab-label">Identify</span>
+            </div>
+            <div class="tab-item" onclick="showStep(2)" id="tab-2">
+                <div class="tab-icon-circle">2</div>
+                <span class="tab-label">Harm</span>
+            </div>
+            <div class="tab-item" onclick="showStep(3)" id="tab-3">
+                <div class="tab-icon-circle">3</div>
+                <span class="tab-label">Mech</span>
+            </div>
+            <div class="tab-item" onclick="showStep(4)" id="tab-4">
+                <div class="tab-icon-circle">4</div>
+                <span class="tab-label">Likely</span>
+            </div>
+            <div class="tab-item" onclick="showStep(5)" id="tab-5">
+                <div class="tab-icon-circle">5</div>
+                <span class="tab-label">Solution</span>
+            </div>
+            <div class="tab-item" onclick="showStep(6)" id="tab-6">
+                <div class="tab-icon-circle">6</div>
+                <span class="tab-label">Docs</span>
+            </div>
+            <div class="tab-item" onclick="showStep(7)" id="tab-7">
+                <div class="tab-icon-circle">7</div>
+                <span class="tab-label">Review</span>
+            </div>
+        </nav>
+
+        <!-- Main Content Panel -->
+        <div class="content-area">
+            <div id="content-container">
+                <!-- Step 1 Content -->
+                <div class="step-content active" id="step-1">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">1. Identify Hazards</h2>
+                    <p class="text-gray-600 mb-6">A systematic walkthrough of the dental practice to spot anything that could cause injury or ill health.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Focus Areas</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Clinical zones (sharps, chemicals, aerosols)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Common areas (trip hazards, electrical points)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Sterilization workflows and equipment</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2 Content -->
+                <div class="step-content" id="step-2">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">2. Assess Harm</h2>
+                    <p class="text-gray-600 mb-6">Determine exactly who is at risk from the identified hazards and the nature of that potential harm.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Stakeholder Groups</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Dental Nurses & Dentists (clinical risks)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Patients (cross-contamination, physical hazards)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Cleaners & External Maintenance Contractors</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 3 Content -->
+                <div class="step-content" id="step-3">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">3. Mechanisms</h2>
+                    <p class="text-gray-600 mb-6">Investigate the sequences and biological/physical mechanisms that lead to harm.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Analysis Points</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Needlestick injury pathways</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Ergonomic strain during prolonged surgery</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Aerosol spread and ventilation efficiency</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 4 Content -->
+                <div class="step-content" id="step-4">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">4. Evaluate Likelihood</h2>
+                    <p class="text-gray-600 mb-6">Quantify the risk level to prioritize management efforts effectively.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Risk Calculation</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Frequency of exposure vs. Severity of outcome</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Current control effectiveness check</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Prioritization of "Imminent Danger" hazards</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 5 Content -->
+                <div class="step-content" id="step-5">
+                    <div class="main-icon-box" style="background: var(--brand-green); color: white;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.32 1.04 4.39 2.7 5.7L9 18h6l1.3-3.3C17.96 13.39 19 11.32 19 9a7 7 0 0 0-7-7z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">5. Implement Solutions</h2>
+                    <p class="text-gray-600 mb-6">The most critical step: executing the plan to mitigate or eliminate identified risks.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Action Plan</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Engineering controls (e.g., safety-engineered sharps)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Administrative controls (staff training, rotations)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Personal Protective Equipment (PPE) mandates</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 6 Content -->
+                <div class="step-content" id="step-6">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">6. Document Findings</h2>
+                    <p class="text-gray-600 mb-6">Creating a legal and practical trail of assessments and actions taken.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Required Records</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Written risk assessments for all hazards</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>COSHH assessment logs for chemicals</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Training sign-off sheets for new protocols</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 7 Content -->
+                <div class="step-content" id="step-7">
+                    <div class="main-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-2" style="color: var(--brand-deep-purple)">7. Regular Review</h2>
+                    <p class="text-gray-600 mb-6">Ensuring the risk management process stays dynamic and relevant over time.</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 class="text-sm font-bold uppercase text-gray-400 mb-3 tracking-wider">Review Triggers</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Annual standard performance audits</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Introduction of new dental technology or staff</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-gray-700">
+                                <span class="text-green-500 font-bold mt-0.5">✓</span>
+                                <span>Following any accident or reported near-miss</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Bar -->
+            <div class="nav-buttons">
+                <button id="prevBtn" class="btn btn-prev" onclick="changeStep(-1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Previous
+                </button>
+                <div class="hidden md:flex items-center text-xs font-bold text-gray-300 uppercase tracking-widest">
+                    Step <span id="currentNum" class="mx-1">1</span> of 7
+                </div>
+                <button id="nextBtn" class="btn btn-next" onclick="changeStep(1)">
+                    Next Step
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        function showStep(stepNum) {
+            currentStep = stepNum;
+            
+            // Update Tabs
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${stepNum}`).classList.add('active');
+
+            // Update Content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`step-${stepNum}`).classList.add('active');
+
+            // Update Header/Footer
+            const currentNumEl = document.getElementById('currentNum');
+            if (currentNumEl) currentNumEl.innerText = stepNum;
+
+            // Update Buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (stepNum === 1) prevBtn.classList.add('btn-disabled');
+            else prevBtn.classList.remove('btn-disabled');
+
+            if (stepNum === totalSteps) {
+                nextBtn.innerText = "Complete";
+                nextBtn.classList.add('bg-green-600');
+                nextBtn.style.backgroundColor = 'var(--brand-green)';
+            } else {
+                nextBtn.innerHTML = `Next Step <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+                nextBtn.style.backgroundColor = 'var(--brand-deep-purple)';
+            }
+
+            // Scroll tab into view for mobile
+            const tab = document.getElementById(`tab-${stepNum}`);
+            tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        function changeStep(delta) {
+            let next = currentStep + delta;
+            if (next >= 1 && next <= totalSteps) {
+                showStep(next);
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            showStep(1);
+        };
+    </script>
+</body>
+</html>
